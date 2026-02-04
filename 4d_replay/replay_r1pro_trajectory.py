@@ -47,7 +47,7 @@ FPS = 60
 DT = 1.0 / FPS
 START_FRAME = 1
 FRAME_LIMIT = None  # Set to an int to limit frames for a quick preview.
-
+ 
 # Joint order matching eval_utils.PROPRIO_QPOS_INDICES for R1Pro
 # (qpos[6:10]=torso, qpos[10:24] interleaves L/R arm joints, qpos[24:28]=grippers).
 JOINT_ORDER = [
