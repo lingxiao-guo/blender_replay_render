@@ -36,6 +36,7 @@ OBJECT_COLLECTION_NAME = "ImportedObjects"
 
 START_FRAME = 1
 FPS = 60
+REALTIME_PREVIEW = False  # Use frame-change handler for real-time playback (no keyframes).
 
 # Add to image_id from ob_in_cam filename when matching.
 CAMERA_ID_OFFSET = 0
@@ -60,6 +61,7 @@ DEFAULT_TASK_NAME = "picking_up_trash"
 
 # Global state for contact-rich overlay handling.
 _OVERLAY_STATE = None
+STATE = {}
 
 
 def parse_args():
@@ -849,6 +851,33 @@ def _contact_overlay_render_cancel(scene):
     _restore_overlay_visibility(state)
 
 
+def replay_object_frame_handler(scene):
+    state = STATE
+    if not state.get("ready"):
+        return
+    start_frame = state.get("start_frame", START_FRAME)
+    image_id = scene.frame_current - start_frame + 1
+    if image_id < 1:
+        return
+    for entry in state.get("objects_to_animate", []):
+        poses = entry.get("filled_poses", {})
+        pose = poses.get(image_id)
+        if pose is None:
+            continue
+        loc, rot, _scale = pose.decompose()
+        obj = entry["obj"]
+        obj.location = loc
+        obj.rotation_euler = rot.to_euler("XYZ")
+
+
+def register_replay_handler():
+    handlers = bpy.app.handlers.frame_change_pre
+    for h in list(handlers):
+        if getattr(h, "__name__", "") == "replay_object_frame_handler":
+            handlers.remove(h)
+    handlers.append(replay_object_frame_handler)
+
+
 def main():
     args = parse_args()
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -964,6 +993,20 @@ def main():
         if entry.get("contact_ids") and entry.get("demo_index") is not None
     ]
     configure_contact_overlay(overlay_entries)
+
+    if REALTIME_PREVIEW:
+        STATE.clear()
+        STATE.update(
+            {
+                "ready": True,
+                "start_frame": START_FRAME,
+                "objects_to_animate": objects_to_animate,
+            }
+        )
+        register_replay_handler()
+        scene.frame_set(START_FRAME)
+        print("Replay handler registered. Press Play for real-time playback.")
+        return
 
     total_keyframes = 0
     for image_id in sorted_global_ids:

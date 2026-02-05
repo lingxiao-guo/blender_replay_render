@@ -115,7 +115,7 @@ def main():
         candidate_dirs = [
             script_dir,
             cwd_dir,
-            os.path.join(cwd_dir, "4d_replay"),
+            os.path.join(cwd_dir, "blender_replay_render/4d_replay"),
         ]
         candidates = []
         for base in candidate_dirs:
