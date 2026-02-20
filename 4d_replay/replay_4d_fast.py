@@ -45,7 +45,7 @@ VIEWPORT_TRANSPARENT = True  # Write alpha so the foreground mask is in the PNG 
 VIEWPORT_COLOR_MODE = "RGBA"  # Must support alpha (e.g., PNG, OPEN_EXR).
 OVERLAY_PARALLEL = True  # Apply overlays in parallel (requires OpenCV).
 OVERLAY_WORKERS = 0  # 0 = auto; otherwise number of worker processes.
-WORLD_BG_COLOR = (0.8666667, 0.7568628, 0.6196079, 1.0)  # Hex #DDC19EFF.
+WORLD_BG_COLOR = (0.92, 0.92, 0.92, 1.0)    # Hex #DDC19EFF.
 
 STATE = {}
 
